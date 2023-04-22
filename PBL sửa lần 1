@@ -1,0 +1,112 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define MAX_SIZE 50
+
+void docDoThi(char* filename, int A[][MAX_SIZE], int* n);
+void sapXepTheoBac(int Bac[], int V[], int n);
+int kiemTraKe(int A[][MAX_SIZE], int n, int u, int Mau[], int m);
+void toMau(int A[][MAX_SIZE], int n, int Mau[]);
+void xuat(int Mau[], int n);
+
+int main() {
+    int A[MAX_SIZE][MAX_SIZE], n;
+    int Mau[MAX_SIZE];
+
+    char* filename = "g.txt";
+
+    docDoThi(filename, A, &n);
+    printf("Ma tran ke:\n");
+    for(int i = 0; i < n; i++){
+        for(int j = 0; j < n; j++){
+            printf("%d ", A[i][j]);
+        }
+        printf("\n");
+    }
+    toMau(A, n, Mau);
+    printf("\nKet qua to mau:\n");
+    xuat(Mau, n);
+
+    return 0;
+}
+
+void docDoThi(char* filename, int A[][MAX_SIZE], int* n){
+    FILE *fi = fopen(filename, "r");
+    if(fi == NULL){
+        printf("Khong mo duoc file %s\n", filename);
+        exit(0);
+    }
+    fscanf(fi, "%d", n);
+    for(int i = 0; i < *n; i++){
+        for(int j = 0; j < *n; j++){
+            fscanf(fi, "%d", &A[i][j]);
+        }
+    }
+    fclose(fi);
+}
+
+void sapXepTheoBac(int Bac[], int V[], int n){
+    int i, j, temp, tempV;
+    for(i = 0; i < n - 1; i++){
+        for(j = i + 1; j < n; j++){
+            if(Bac[i] < Bac[j]){
+                temp = Bac[i];
+                Bac[i] = Bac[j];
+                Bac[j] = temp;
+                tempV = V[i];
+                V[i] = V[j];
+                V[j] = tempV;
+            }
+        }
+    }
+}
+
+int kiemTraKe(int A[][MAX_SIZE], int n, int u, int Mau[], int m){
+    int i, v;
+    for(i = 0; i < n; i++){
+        if(A[u][i] > 0){
+            v = i;
+            if(Mau[v] == m){
+                return 0;
+            }
+        }
+    }
+    return 1;
+}
+
+void toMau(int A[][MAX_SIZE], int n, int Mau[]) {
+    int Bac[MAX_SIZE], V[MAX_SIZE];
+    int i, j, u, m;
+
+    for (i = 0; i < n; i++) {
+        Bac[i] = 0;
+        for (j = 0; j < n; j++) {
+            Bac[i] += A[i][j];
+        }
+        V[i] = i;
+    }
+
+    sapXepTheoBac(Bac, V, n);
+
+    m = 1;
+    for (i = 0; i < n; i++) {
+        u = V[i];
+        if (Mau[u] == 0) {
+            Mau[u] = m;
+            for (j = i + 1; j < n; j++) {
+                if (kiemTraKe(A, n, u, Mau, m)) {
+                    Mau[V[j]] = m;
+                }
+            }
+            m++;
+        }
+    }
+}
+
+
+void xuat(int Mau[], int n){
+for(int i = 0; i < n; i++){
+printf("Dinh %d duoc to mau %d\n", i, Mau[i]);
+}
+}
